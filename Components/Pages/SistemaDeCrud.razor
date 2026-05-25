@@ -1,0 +1,260 @@
+﻿@page "/sistemaCRUD"
+@using FarmaciaSimilares01.Models
+@using FarmaciaSimilares01.Data
+@inject MedicamentosDbContext db
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+
+
+<head>
+    <title>Farmacia VitalCure | Cuidamos de ti</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a45b8cb890.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+2.
+<body>
+
+    <header>
+
+        <nav class="nav-page">
+            <ul>
+                <div class="logo-img">
+                    <img src="/img/logo-similares.png" alt="">
+                </div>
+                <li><a href="#">Catálogo</a></li>
+                <li><a href="#">Registrarte</a></li>
+                <li><a href="#">Historial</a></li>
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+
+
+
+
+    @*================================================================================
+    AGREGAR CLIENTE
+    =================================================================================*@
+
+
+
+    <main>
+
+        <form>
+
+            <div class="form-group">
+
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ingresa tu nombre" required @bind="nuevoCliente.Nombre">
+
+                <label for="descripcion">Número de teléfono:</label>
+                <input type="text" id="telefono" name="telefono" class="form-control" placeholder="Ingresa tu número de teléfono" required @bind="nuevoCliente.Telefono">
+
+                <label for="precio">Correo electrónico:</label>
+                <input type="email" id="correo" name="correo" class="form-control" placeholder="Ingresa tu correo electrónico" required @bind="nuevoCliente.Email">
+
+                <label for="fechaRegistro">Fecha de registro:</label>
+                <input type="date" id="fechaRegistro" name="fechaRegistro" class="form-control" required @bind="nuevoCliente.FechaRegistro">
+
+                
+                <button type="button" class="btn btn-primary" @onclick="AgregarCliente">Registrarte</button>
+
+                   
+               
+            </div>
+
+        </form>
+
+
+        @*================================================================================
+    MOSTRAR CLIENTE
+    =================================================================================*@
+
+        <table class="table table-striped">
+
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Fecha de registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cliente in clientes)
+                {
+                    <tr>
+                        <td>@cliente.Id</td>
+                        <td>@cliente.Nombre</td>
+                        <td>@cliente.Telefono</td>
+                        <td>@cliente.Email</td>
+                        <td>@cliente.FechaRegistro.ToShortDateString()</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" @onclick="() => IniciarEdicion(cliente)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" @onclick="() => EliminarCliente(cliente)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+
+        </table>
+
+   
+
+
+        @*================================================================================
+    EDITAR CLIENTE
+    =================================================================================*@
+
+        @if (clienteEnEdicion != null)
+        {
+
+            <form>
+
+                <div class="form-group">
+
+                    <h3>Editar Cliente: @clienteEnEdicion.Nombre</h3>
+
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ingresa tu nombre" required @bind="clienteEnEdicion.Nombre">
+
+                    <label for="descripcion">Número de teléfono:</label>
+                    <input type="text" id="telefono" name="telefono" class="form-control" placeholder="Ingresa tu número de teléfono" required @bind="clienteEnEdicion.Telefono">
+
+                    <label for="precio">Correo electrónico:</label>
+                    <input type="email" id="correo" name="correo" class="form-control" placeholder="Ingresa tu correo electrónico" required @bind="clienteEnEdicion.Email">
+
+                    <label for="fechaRegistro">Fecha de registro:</label>
+                    <input type="date" id="fechaRegistro" name="fechaRegistro" class="form-control" required @bind="clienteEnEdicion.FechaRegistro">
+
+            
+                    <button type="submit" class="btn btn-success" @onclick="GuardarEdicion">Guardar cambios</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CancelarEdicion">Cancelar</button>
+
+                </div>
+            </form>
+
+        }
+
+
+ 
+    </main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <footer>
+        <p>&copy; 2026 Farmacias Similares. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+
+@code {
+
+
+    /*================================================================================
+    VARIABLES
+     =================================================================================*/
+
+    private Cliente nuevoCliente = new Cliente() { FechaRegistro = DateTime.Today };
+    private List<Cliente> clientes = new List<Cliente>();
+    private Cliente? clienteEnEdicion = null;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await cargarClientes();
+    }
+
+
+ 
+    private async Task cargarClientes()
+    {
+
+        clientes = await db.ClientesF.ToListAsync();
+    }
+
+
+    /*================================================================================
+                                      AGREGAR CLIENTE
+ =================================================================================*/
+
+    private async Task AgregarCliente()
+    {
+        if (!string.IsNullOrWhiteSpace(nuevoCliente.Nombre))
+        {
+            db.ClientesF.Add(nuevoCliente);
+            await db.SaveChangesAsync();
+            await cargarClientes();
+
+          
+            nuevoCliente = new Cliente() { FechaRegistro = DateTime.Today };
+        }
+    }
+
+
+    /*================================================================================
+                                      EDITAR CLIENTE
+    =================================================================================*/
+
+    private void IniciarEdicion(Cliente cliente)
+    {
+
+        clienteEnEdicion = cliente;
+    }
+
+    private async Task GuardarEdicion()
+    {
+
+        if (clienteEnEdicion != null)
+        {
+            await db.SaveChangesAsync();
+            clienteEnEdicion = null;
+            await cargarClientes();
+        }
+    }
+
+    private void CancelarEdicion()
+    {
+        clienteEnEdicion = null;
+    }
+
+
+    
+    /*================================================================================
+                                         ELIMINAR CLIENTE
+   =================================================================================*/
+
+    private async Task EliminarCliente(Cliente cliente)
+    {
+        db.ClientesF.Remove(cliente);
+        await db.SaveChangesAsync();
+        await cargarClientes();
+    }
+
+
+
+}
+
