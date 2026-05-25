@@ -2,8 +2,6 @@
 {
     using FarmaciaSimilares01.Models;
     using Microsoft.EntityFrameworkCore;
-    using FarmaciaSimilares01.Models;
-
 
     public class MedicamentosDbContext : DbContext
     {
