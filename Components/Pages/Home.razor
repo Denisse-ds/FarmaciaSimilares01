@@ -1,7 +1,73 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+@rendermode InteractiveServer
 
-<h1>Hello, world!</h1>
+<head>
+    <title>Farmacia Similares</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a45b8cb890.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
 
-Welcome to your new app.
+<body>
+
+    <header>
+
+        <nav class="nav-page">
+            <ul>
+                <div class="logo-img">
+                    <img src="/img/logo-similares.png" alt="">
+                </div>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="#">Catálogo</a></li>
+                <li><a href="/sistemaCRUD">Registrarte</a></li>
+                <li><a href="#">Historial</a></li>
+            </ul>
+
+        </nav>
+
+    </header>
+
+    <div class="banner-container">
+        <img src="img/anuncion.jpg" alt="Súper Descuentos" class="banner-img">
+    </div>
+
+    <h2 class="titulo-seccion">Recomendaciones de la semana</h2>
+
+    <section class="recomendaciones-semana">
+        <div class="card">
+            <img src="/img/paras.webp" alt="Producto 1">
+            <p>Vitasimi Senior</p>
+            <span>$350.00</span>
+            <button>Saber más</button>
+        </div>
+
+        <div class="card">
+            <img src="/img/paras.webp" alt="Producto 2">
+            <p>Vitasimi Dectrone</p>
+            <span>$350.00</span>
+            <button>Saber más</button>
+        </div>
+
+        <div class="card">
+            <img src="/img/paras.webp" alt="Producto 3">
+            <p>Simisun FPS 50+</p>
+            <span>$420.00</span>
+            <button>Saber más</button>
+        </div>
+
+        <div class="card">
+            <img src="/img/paras.webp" alt="Producto 4">
+            <p>Simisun FPS 50+</p>
+            <span>$420.00</span>
+            <button>Saber más</button>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Farmacias Similares. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
