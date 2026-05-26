@@ -1,0 +1,247 @@
+﻿@page "/catalogo"
+@inject HttpClient Http
+@using FarmaciaSimilares01.Models
+<body>
+    <header>
+
+        <nav class="nav-page">
+            <ul>
+                <div class="logo-img">
+                    <img src="/img/logo-similares.png" alt="">
+                </div>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/catalogo">Catálogo</a></li>
+                <li><a href="/sistemaCRUD">Registrarte</a></li>
+                <li><a href="#">Historial</a></li>
+            </ul>
+
+        </nav>
+
+    </header>
+
+    <main>
+        <h2 class="titulo-seccion">Catálogo de Productos</h2>
+
+        <div class="dividir-pantalla">
+
+            <aside>
+                <div class="filtros-container">
+                    <button class="btn @(modoVista == "Todos" ? "btn-activo" : "btn-inactivo")" @onclick="CargarTodos">
+                        Todos los Productos
+                    </button>
+                    <button class="btn @(modoVista == "SinReceta" ? "btn-activo" : "btn-inactivo")" @onclick="CargarSinReceta">
+                        Sin Receta
+                    </button>
+                </div>
+
+                <div class="especialidades-container">
+                    <h4>Filtrar por Especialidad:</h4>
+                    <div class="checkbox-grid">
+                        @if (listaEspecialidades != null)
+                        {
+                            @foreach (var esp in listaEspecialidades)
+                            {
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="@esp.Id" @onchange="(e) => AlCambiarEspecialidad(esp.Id, e.Value)" checked="@especialidadesSeleccionadas.Contains(esp.Id)" />
+                                    <span class="custom-checkbox"></span>
+                                    @esp.nombre
+                                </label>
+                            }
+                        }
+                        else
+                        {
+                            <span class="cargando-texto">Cargando especialidades...</span>
+                        }
+                    </div>
+                </div>
+            </aside>
+
+            @if (cargando)
+            {
+                <div class="mensaje-carga">
+                    <p>Cargando productos, por favor espera...</p>
+                </div>
+            }
+            else
+            {
+                <div class="cards-grid">
+                    @if (ListaActual != null && ListaActual.Any())
+                    {
+                        @foreach (var prod in ListaActual)
+                        {
+                            <div class="card">
+                                <div class="card-header">
+                                    @if (modoVista == "Todos" || modoVista == "Especialidad")
+                                    {
+                                        @if (prod.requierereceta)
+                                        {
+                                            <span class="badge-receta-si">Requiere Receta</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-receta-no">No requiere receta</span>
+                                        }
+                                    }
+                                    @* <span class="card-id">(@prod.Id)</span>*@
+                                </div>
+                                <div class="card-body">
+                                    <h3 class="producto-nombre">@prod.nombre</h3>
+                                    <p class="producto-detalle"><strong>Laboratorio:</strong> @prod.laboratorio</p>
+                                    <p class="producto-detalle"><strong>Presentación:</strong> @prod.presentacion</p>
+                                    <p class="producto-especialidad">@prod.especialidad</p>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="producto-precio">$@prod.precio</span>
+                                    @*  <button class="btn-comprar">Agregar</button>*@
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                            <p>No se encontraron productos con los filtros seleccionados.</p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </main>
+</body>
+
+
+@code {
+    private List<ProductoTodos>? listaTodos;
+    private List<SinReceta>? listaSinReceta;
+    private List<Especialidad>? listaEspecialidades;
+
+    private IEnumerable<dynamic>? ListaActual;
+
+ 
+    private string modoVista = "Todos";
+    private bool cargando = true;
+
+
+    private List<int> especialidadesSeleccionadas = new List<int>();
+
+
+    private string urlTodos = "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/productos";
+    private string urlSinReceta = "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/productos/sinreceta";
+    private string urlEspecialidades = "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/especialidades";
+    private string urlFiltroEspecialidadBase = "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/productos/especialidad/";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+ 
+            listaEspecialidades = await Http.GetFromJsonAsync<List<Especialidad>>(urlEspecialidades);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar especialidades: {ex.Message}");
+            listaEspecialidades = new List<Especialidad>(); 
+        }
+
+        await CargarTodos();
+    }
+
+    private async Task CargarTodos()
+    {
+        cargando = true;
+        modoVista = "Todos";
+        especialidadesSeleccionadas.Clear(); // Limpiamos selección
+
+        try
+        {
+            if (listaTodos == null)
+                listaTodos = await Http.GetFromJsonAsync<List<ProductoTodos>>(urlTodos);
+
+            ListaActual = listaTodos;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar todos los productos: {ex.Message}");
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private async Task CargarSinReceta()
+    {
+        cargando = true;
+        modoVista = "SinReceta";
+        especialidadesSeleccionadas.Clear();
+
+        try
+        {
+            if (listaSinReceta == null)
+                listaSinReceta = await Http.GetFromJsonAsync<List<SinReceta>>(urlSinReceta);
+
+            ListaActual = listaSinReceta;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar productos sin receta: {ex.Message}");
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private async Task AlCambiarEspecialidad(int especialidadId, object? isChecked)
+    {
+        bool marcado = (bool)(isChecked ?? false);
+
+        if (marcado)
+        {
+            especialidadesSeleccionadas.Add(especialidadId);
+        }
+        else
+        {
+            especialidadesSeleccionadas.Remove(especialidadId);
+        }
+
+        await BuscarPorEspecialidades();
+    }
+
+    private async Task BuscarPorEspecialidades()
+    {
+        if (!especialidadesSeleccionadas.Any())
+        {
+            await CargarTodos();
+            return;
+        }
+
+        cargando = true;
+        modoVista = "Especialidad";
+        var resultadosCombinados = new List<ProductoTodos>();
+
+        try
+        {
+            foreach (var id in especialidadesSeleccionadas)
+            {
+                var urlConsulta = $"{urlFiltroEspecialidadBase}{id}";
+                var productosEspecialidad = await Http.GetFromJsonAsync<List<ProductoTodos>>(urlConsulta);
+
+                if (productosEspecialidad != null)
+                {
+                    resultadosCombinados.AddRange(productosEspecialidad);
+                }
+            }
+
+            ListaActual = resultadosCombinados;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al filtrar por especialidad: {ex.Message}");
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+}
