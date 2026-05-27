@@ -1,0 +1,83 @@
+﻿@page "/mis-commits"
+@using FarmaciaSimilares01.Data 
+@inject GitService GitService 
+
+<body>
+    <header>
+
+        <nav class="nav-page">
+            <ul>
+                <div class="logo-img">
+                    <img src="/img/logo-similares.png" alt="">
+                </div>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/catalogo">Catálogo</a></li>
+                <li><a href="/sistemaCRUD">Registrarte</a></li>
+                <li><a href="/mis-commits">Historial</a></li>
+            </ul>
+
+        </nav>
+
+    </header>
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white d-flex align-items-center">
+            <h3 class="mb-0">📜 Historial de Git (Commits del Proyecto)</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Esta pantalla lee directamente la carpeta <code>.git</code> local y muestra los cambios de código realizados.</p>
+
+            @if (listaDeCommits == null)
+            {
+                <div class="d-flex align-items-center gap-2">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <span>Leyendo el repositorio de Git...</span>
+                </div>
+            }
+            else if (!listaDeCommits.Any())
+            {
+                <div class="alert alert-warning">No se encontraron commits en este repositorio.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Commit ID</th>
+                                <th>Mensaje / Descripción</th>
+                                <th>Autor</th>
+                                <th>Fecha y Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var commit in listaDeCommits)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-secondary font-monospace">@commit.IdCorto</span>
+                                    </td>
+                                    <td class="fw-bold text-dark">@commit.Mensaje</td>
+                                    <td>👤 @commit.Autor</td>
+                                    <td class="text-muted">📅 @commit.Fecha.ToString("dd/MM/yyyy hh:mm tt")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+    <footer>
+        <p>&copy; 2026 Farmacias Similares. Todos los derechos reservados.</p>
+    </footer>
+</body>
+@code {
+    private List<GitCommitModel>? listaDeCommits;
+
+    protected override void OnInitialized()
+    {
+        listaDeCommits = GitService.ObtenerHistorialCommits();
+    }
+}

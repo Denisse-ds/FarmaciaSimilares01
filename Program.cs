@@ -15,6 +15,7 @@ builder.Services.AddDbContext<MedicamentosDbContext>(options =>
 );
 
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<GitService>();
 
 var app = builder.Build();
 
