@@ -1,7 +1,9 @@
 ﻿@page "/catalogo"
 @inject HttpClient Http
 @using FarmaciaSimilares01.Models
-<body>
+
+<PageTitle>Farmacia Similares</PageTitle>
+
     <header>
 
         <nav class="nav-page">
@@ -12,7 +14,7 @@
                 <li><a href="/">Inicio</a></li>
                 <li><a href="/catalogo">Catálogo</a></li>
                 <li><a href="/sistemaCRUD">Registrarte</a></li>
-                <li><a href="/mis-commits">Historial</a></li>
+            <li><a href="/venta">Historial</a></li>
             </ul>
 
         </nav>
@@ -110,7 +112,7 @@
     <footer>
         <p>&copy; 2026 Farmacias Similares. Todos los derechos reservados.</p>
     </footer>
-</body>
+
 
 
 @code {

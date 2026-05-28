@@ -6,14 +6,7 @@
 @inject HttpClient Http
 @inject MedicamentosDbContext DbContext
 
-<head>
-    <title>Farmacia Similares</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a45b8cb890.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
+<PageTitle>Farmacia Similares</PageTitle>
 
 <body>
 
@@ -241,7 +234,6 @@
     private ProductoTodos? productoSeleccionado;
     private int cantidadIngresada = 1;
 
-    // Clase interna auxiliar para renderizar datos de la API en la vista temporalmente
     private class ItemCarrito
     {
         public string NombreTemporal { get; set; } = "";
@@ -254,7 +246,6 @@
     private decimal totalVenta => carritoAuxiliar.Sum(x => x.Detalle.Cantidad * x.Detalle.Precio);
     private bool mostrarAlertaExito = false;
 
-    // URL de la nueva API de Salud que me proporcionaste
     private const string UrlProductosSalud = "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/productos";
 
     protected override async Task OnInitializedAsync()
@@ -264,15 +255,13 @@
 
     private async Task CargarDatosIniciales()
     {
+ 
         try
         {
-            // 1. Carga clientes locales
+
             clientesLista = await DbContext.ClientesF.OrderBy(c => c.Nombre).ToListAsync();
 
-            // 2. Carga la API de Salud (Medicamentos)
-            productosApiLista = await Http.GetFromJsonAsync<List<ProductoTodos>>(UrlProductosSalud);
-
-            // 3. Carga el historial de Tickets guardados en Azure SQL
+ 
             historialTickets = await DbContext.TicketsF
                 .Include(t => t.Cliente)
                 .Include(t => t.Detalles)
@@ -281,11 +270,24 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error de inicialización: {ex.Message}");
+            Console.WriteLine($"Error al cargar datos locales de SQL: {ex.Message}");
+        }
+
+     
+        try
+        {
+          
+            productosApiLista = await Http.GetFromJsonAsync<List<ProductoTodos>>(UrlProductosSalud);
+        }
+        catch (Exception ex)
+        {
+        
+            productosApiLista = new List<ProductoTodos>();
+            Console.WriteLine($"La API externa está fuera de servicio o tardó demasiado: {ex.Message}");
         }
     }
 
-    // Cruce dinámico: busca el id en la respuesta de la API para pintar el nombre en el historial
+
     private string ObtenerNombreProducto(int apiId)
     {
         var prod = productosApiLista?.FirstOrDefault(p => p.Id == apiId);
@@ -345,7 +347,6 @@
 
         try
         {
-            // 1. Instanciamos la cabecera del Ticket operativo
             var nuevoTicket = new Ticket
             {
                 ClienteId = clienteSeleccionadoId,
@@ -355,20 +356,16 @@
             };
 
             DbContext.TicketsF.Add(nuevoTicket);
-            await DbContext.SaveChangesAsync(); // SQL genera el Ticket.Id
+            await DbContext.SaveChangesAsync();
 
-            // 2. Recorremos el carrito insertando los detalles con el ID de la cabecera
             foreach (var item in carritoAuxiliar)
             {
                 item.Detalle.TicketId = nuevoTicket.Id;
-
-                // OJO: Asegúrate de que este DbSet se llame así en tu AppDbContext (DetallesTickets)
                 DbContext.DetalleTicketsF.Add(item.Detalle);
             }
 
             await DbContext.SaveChangesAsync();
 
-            // Refrescamos todo el historial para que aparezca la nueva fila abajo de inmediato
             await CargarDatosIniciales();
 
             carritoAuxiliar.Clear();

@@ -433,132 +433,297 @@ aside {
 
 
 
-/* =================================================================================
-   PANTALLA 4: PESTAÑAS DE NAVEGACIÓN (TABS)
-==================================================================================== */
-.tabs-navegacion {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0 30px 0;
+/* =====================================================
+               CONTENEDOR PRINCIPAL Y LAYOUT
+   ===================================================== */
+.punto-venta-container {
+    max-width: 1300px;
+    margin: 30px auto;
+    padding: 0 20px;
+    font-family: Arial, sans-serif;
+}
+
+.encabezado-pagina {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+    .encabezado-pagina h2 {
+        color: var(--color-azul);
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .encabezado-pagina p {
+        color: #666666;
+    }
+
+/* Flexbox/Grid para dividir pantalla */
+.bloque-operativo {
     display: flex;
-    gap: 15px;
-    justify-content: center;
-    border-bottom: 2px solid rgba(14, 76, 160, 0.1);
+    gap: 30px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
 }
 
-    .tabs-navegacion li {
-        margin-bottom: -2px; /* Monta el botón sobre el borde inferior */
-    }
-
-.tab-btn {
-    background: none;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.columna-formulario {
+    flex: 1;
+    min-width: 320px;
 }
 
-  
-    .tab-btn.pestaña-activa {
-        color: var(--color-azul);
-        border-bottom: 3px solid var(--color-azul);
-    }
-
-   
-    .tab-btn.pestaña-inactiva {
-        color: #64748b;
-        border-bottom: 3px solid transparent;
-    }
-
-    .tab-btn:hover {
-        color: var(--color-azul);
-    }
-
-/* =================================================================================
-   ESTILOS COMPLEMENTARIOS PARA EL FORMULARIO (Basado en tu CRUD)
-==================================================================================== */
-
-.seccion-total {
-    margin: 25px 0;
-    text-align: center;
-    padding: 15px;
-    background-color: var(--color-gris-claro);
-    border-radius: 10px;
-    border: 1px dashed rgba(14, 76, 160, 0.2);
+.columna-carrito {
+    flex: 2;
+    min-width: 450px;
 }
 
-    .seccion-total h2 {
-        color: #B3190B;
-        font-weight: 900;
-        margin: 0;
-        font-size: 28px;
-    }
-
-/* Mensajes de feedback estilo CRUD */
-.mensaje-exito {
-    color: #0f5132;
-    background-color: #d1e7dd;
-    border: 1px solid #badbcc;
-    padding: 12px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.mensaje-error {
-    color: #842029;
-    background-color: #f8d7da;
-    border: 1px solid #f5c2c7;
-    padding: 12px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-/* =================================================================================
-   DISEÑO DE TABLAS Y DECORACIONES (SISTEMA DE HISTORIAL)
-==================================================================================== */
-
-.tabla-contenedor {
-    overflow-x: auto;
-    width: 100%;
-    margin-top: 15px;
-    border-radius: 8px;
+/* =====================================================
+                     TARJETAS (CARDS)
+   ===================================================== */
+.card-formulario, .card-carrito, .card-historial {
+    background-color: var(--color-fondo);
+    border: 1px solid #eaeaea;
+    border-radius: 15px;
+    padding: 25px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+    .card-formulario h3, .card-carrito h3, .card-historial h3 {
+        color: var(--color-azul);
+        font-size: 22px;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid var(--color-amarillo);
+    }
 
-.texto-exito {
-    font-weight: bold;
-    color: #0BB321 !important;
+/* =====================================================
+               CAMPOS DE FORMULARIO E INPUTS
+   ===================================================== */
+.campo-grupo {
+    margin-bottom: 20px;
 }
 
+    .campo-grupo label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: var(--color-texto);
+    }
 
-.texto-negrita {
+.control-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+    .control-input:focus {
+        border-color: var(--color-azul);
+        outline: none;
+    }
+
+/* =====================================================
+                        BOTONES
+   ===================================================== */
+.btn-agregar-ticket {
+    width: 100%;
+    background-color: var(--color-azul);
+    color: var(--color-fondo);
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+    .btn-agregar-ticket:hover {
+        background-color: #083670;
+        transform: translateY(-2px);
+    }
+
+    .btn-agregar-ticket:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+
+.btn-guardar-azure {
+    background-color: var(--color-amarillo);
+    color: var(--color-azul);
+    border: none;
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+    .btn-guardar-azure:hover {
+        background-color: #e6bf00;
+        transform: scale(1.03);
+    }
+
+    .btn-guardar-azure:disabled {
+        background-color: #e2e2e2;
+        color: #999999;
+        cursor: not-allowed;
+    }
+
+.btn-quitar-item {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* =====================================================
+                        TABLAS
+   ===================================================== */
+.tabla-responsiva {
+    overflow-x: auto;
+}
+
+.tabla-punto-venta, .tabla-historial {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+    .tabla-punto-venta th, .tabla-historial th {
+        background-color: var(--color-azul);
+        color: var(--color-fondo);
+        padding: 12px;
+        text-align: left;
+    }
+
+    .tabla-punto-venta td, .tabla-historial td {
+        padding: 12px;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+.tabla-vacia {
+    text-align: center;
+    color: #999999;
+    padding: 40px 0 !important;
+}
+
+/* Alineaciones y Textos */
+.texto-centro {
+    text-align: center;
+}
+
+.texto-derecha {
+    text-align: right;
+}
+
+.texto-destacado {
+    font-weight: bold;
+    color: var(--color-texto);
+}
+
+.texto-secundario {
+    color: #666666;
+    font-size: 14px;
+}
+
+.subtotal-monto {
+    color: #dc3545;
     font-weight: bold;
 }
 
-.etiqueta-api {
-    font-size: 13px;
-    background-color: #fef3c7; 
-    color: #92400e; 
-    padding: 4px 10px;
+/* TOTAL INFERIOR */
+.resumen-ticket-inferior {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.etiqueta-total {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #666666;
+    display: block;
+}
+
+.monto-total-numero {
+    margin: 0;
+    font-size: 24px;
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* =====================================================
+            ALERTAS Y ETIQUETAS (BADGES)
+   ===================================================== */
+.alerta-exito {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.btn-cerrar-alerta {
+    position: absolute;
+    right: 15px;
+    top: 12px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.alerta-receta {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 10px;
     border-radius: 6px;
-    display: inline-block;
-    font-weight: 500;
-    border: 1px solid #fde68a;
+    margin-bottom: 15px;
+    font-size: 14px;
 }
 
-
-.etiqueta-commit {
-    font-family: monospace;
-    background-color: #e2e8f0; 
-    color: #334155;
+.badge-receta {
+    background-color: var(--color-amarillo);
+    color: var(--color-azul);
+    font-size: 11px;
     padding: 3px 8px;
-    border-radius: 4px;
+    border-radius: 10px;
     font-weight: bold;
+    margin-left: 5px;
 }
+
+/* HISTORIAL COMPLEMENTOS */
+.ticket-id {
+    color: #dc3545;
+    font-weight: bold;
+    text-align: center;
+}
+
+.total-final-historial {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 18px;
+    text-align: right;
+}
+
+.lista-detalles-historial {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .lista-detalles-historial li {
+        margin-bottom: 5px;
+    }
+
+    .lista-detalles-historial i {
+        color: var(--color-azul);
+    }
