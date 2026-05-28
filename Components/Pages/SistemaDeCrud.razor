@@ -195,9 +195,9 @@
     {
         if (!string.IsNullOrWhiteSpace(nuevoCliente.Nombre))
         {
-            db.ClientesF.Add(nuevoCliente);
-            await db.SaveChangesAsync();
-            await cargarClientes();
+            db.ClientesF.Add(nuevoCliente); // Agrega el nuevo cliente al contexto
+            await db.SaveChangesAsync();  // Guarda los cambios en la base de datos
+            await cargarClientes(); // Recarga la lista de clientes para mostrar el nuevo cliente agregado
 
           
             nuevoCliente = new Cliente() { FechaRegistro = DateTime.Today };

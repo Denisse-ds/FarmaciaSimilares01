@@ -15,7 +15,7 @@ builder.Services.AddDbContext<MedicamentosDbContext>(options =>
 );
 
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<GitService>();
+builder.Services.AddScoped<GitService>(); // Agregar el servicio GitService al contenedor de servicios para que pueda ser inyectado en los componentes que lo necesiten
 
 var app = builder.Build();
 

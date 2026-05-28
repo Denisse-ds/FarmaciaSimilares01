@@ -431,3 +431,134 @@ aside {
         color: var(--color-azul);
     }
 
+
+
+/* =================================================================================
+   PANTALLA 4: PESTAÑAS DE NAVEGACIÓN (TABS)
+==================================================================================== */
+.tabs-navegacion {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 30px 0;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    border-bottom: 2px solid rgba(14, 76, 160, 0.1);
+}
+
+    .tabs-navegacion li {
+        margin-bottom: -2px; /* Monta el botón sobre el borde inferior */
+    }
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+  
+    .tab-btn.pestaña-activa {
+        color: var(--color-azul);
+        border-bottom: 3px solid var(--color-azul);
+    }
+
+   
+    .tab-btn.pestaña-inactiva {
+        color: #64748b;
+        border-bottom: 3px solid transparent;
+    }
+
+    .tab-btn:hover {
+        color: var(--color-azul);
+    }
+
+/* =================================================================================
+   ESTILOS COMPLEMENTARIOS PARA EL FORMULARIO (Basado en tu CRUD)
+==================================================================================== */
+
+.seccion-total {
+    margin: 25px 0;
+    text-align: center;
+    padding: 15px;
+    background-color: var(--color-gris-claro);
+    border-radius: 10px;
+    border: 1px dashed rgba(14, 76, 160, 0.2);
+}
+
+    .seccion-total h2 {
+        color: #B3190B;
+        font-weight: 900;
+        margin: 0;
+        font-size: 28px;
+    }
+
+/* Mensajes de feedback estilo CRUD */
+.mensaje-exito {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border: 1px solid #badbcc;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.mensaje-error {
+    color: #842029;
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* =================================================================================
+   DISEÑO DE TABLAS Y DECORACIONES (SISTEMA DE HISTORIAL)
+==================================================================================== */
+
+.tabla-contenedor {
+    overflow-x: auto;
+    width: 100%;
+    margin-top: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+
+.texto-exito {
+    font-weight: bold;
+    color: #0BB321 !important;
+}
+
+
+.texto-negrita {
+    font-weight: bold;
+}
+
+.etiqueta-api {
+    font-size: 13px;
+    background-color: #fef3c7; 
+    color: #92400e; 
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    font-weight: 500;
+    border: 1px solid #fde68a;
+}
+
+
+.etiqueta-commit {
+    font-family: monospace;
+    background-color: #e2e8f0; 
+    color: #334155;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}

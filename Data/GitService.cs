@@ -5,23 +5,23 @@ using System.IO;
 
 namespace FarmaciaSimilares01.Data
 {
-    public class GitService // Servicio para obtener el historial de commits de Git
+    public class GitService // Servicio para interactuar con el repositorio Git y obtener información de los commits
     {
-        public List<GitCommitModel> ObtenerHistorialCommits() // Método para obtener la lista de commits del repositorio Git
+        public List<GitCommitModel> ObtenerHistorialCommits() // Método para obtener una lista de commits del repositorio Git
         {
-            var listaCommits = new List<GitCommitModel>(); // Lista para almacenar los commits
+            var listaCommits = new List<GitCommitModel>(); // Lista para almacenar los commits obtenidos
 
             string rutaBase = AppDomain.CurrentDomain.BaseDirectory; // Obtener la ruta base de la aplicación
 
-            string rutaProyecto = Directory.GetParent(rutaBase)?.Parent?.Parent?.Parent?.FullName ?? ""; // Intentar subir 4 niveles para llegar a la raíz del proyecto
+            string rutaProyecto = Directory.GetParent(rutaBase)?.Parent?.Parent?.Parent?.FullName ?? "";  // Construir la ruta al proyecto (ajustar según la estructura de carpetas)
 
-            try
+            try // Intentar abrir el repositorio Git y leer los commits
             {
-                using (var repo = new Repository(rutaProyecto))
+                using (var repo = new Repository(rutaProyecto)) // Abrir el repositorio Git ubicado en la ruta del proyecto
                 {
-                    foreach (Commit c in repo.Commits)
+                    foreach (Commit c in repo.Commits) // Iterar sobre cada commit en el repositorio
                     {
-                        listaCommits.Add(new GitCommitModel
+                        listaCommits.Add(new GitCommitModel // Agregar un nuevo modelo de commit a la lista con información relevante del commit
                         {
                             IdCorto = c.Id.Sha.Substring(0, 7),
                             Mensaje = c.MessageShort,
@@ -31,7 +31,7 @@ namespace FarmaciaSimilares01.Data
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) // Capturar cualquier excepción que ocurra al intentar leer el repositorio Git y agregar un commit de error a la lista
             {
                 listaCommits.Add(new GitCommitModel
                 {
@@ -46,7 +46,7 @@ namespace FarmaciaSimilares01.Data
         }
     }
 
-    public class GitCommitModel
+    public class GitCommitModel // Modelo para representar un commit de Git con propiedades relevantes
     {
         public string IdCorto { get; set; } = "";
         public string Mensaje { get; set; } = "";

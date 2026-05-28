@@ -1,8 +1,22 @@
-﻿@page "/mis-commits"
+﻿@page "/venta"
+@rendermode InteractiveServer
+@using FarmaciaSimilares01.Models
 @using FarmaciaSimilares01.Data 
-@inject GitService GitService 
+@using Microsoft.EntityFrameworkCore
+@inject HttpClient Http
+@inject MedicamentosDbContext DbContext
+
+<head>
+    <title>Farmacia Similares</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a45b8cb890.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
 
 <body>
+
     <header>
 
         <nav class="nav-page">
@@ -13,53 +27,198 @@
                 <li><a href="/">Inicio</a></li>
                 <li><a href="/catalogo">Catálogo</a></li>
                 <li><a href="/sistemaCRUD">Registrarte</a></li>
-                <li><a href="/mis-commits">Historial</a></li>
+                <li><a href="/venta">Historial</a></li>
             </ul>
 
         </nav>
 
     </header>
-<div class="container mt-4">
-    <div class="card shadow">
-        <div class="card-header bg-dark text-white d-flex align-items-center">
-            <h3 class="mb-0">📜 Historial de Git (Commits del Proyecto)</h3>
-        </div>
-        <div class="card-body">
-            <p class="text-muted">Esta pantalla lee directamente la carpeta <code>.git</code> local y muestra los cambios de código realizados.</p>
 
-            @if (listaDeCommits == null)
-            {
-                <div class="d-flex align-items-center gap-2">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <span>Leyendo el repositorio de Git...</span>
+    <div class="punto-venta-container">
+        <div class="encabezado-pagina">
+            <h2><i class="bi bi-capsule"></i> Farmacia - Punto de Venta</h2>
+            <p>Registro operativo de Tickets integrado con la API de Medicamentos externa</p>
+        </div>
+
+        @if (mostrarAlertaExito)
+        {
+            <div class="alerta-exito" role="alert">
+                <strong>¡Ticket Generado con Éxito!</strong> La transacción se guardó correctamente en tu Azure SQL y se actualizó el historial.
+                <button type="button" class="btn-cerrar-alerta" @onclick="() => mostrarAlertaExito = false">×</button>
+            </div>
+        }
+
+        <div class="bloque-operativo">
+            @* --- COLUMNA IZQUIERDA: NUEVA VENTA --- *@
+            <div class="columna-formulario">
+                <div class="card-formulario">
+                    <h3>Nueva Venta</h3>
+
+                    <div class="campo-grupo">
+                        <label>1. Paciente / Cliente:</label>
+                        <select class="control-input" @bind="clienteSeleccionadoId">
+                            <option value="0">-- Seleccionar Cliente --</option>
+                            @if (clientesLista != null)
+                            {
+                                @foreach (var cli in clientesLista)
+                                {
+                                    <option value="@cli.Id">@cli.Nombre</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label>2. Medicamento / Producto (API):</label>
+                        <select class="control-input" @onchange="OnProductoSelected">
+                            <option value="0">-- Seleccionar de la API --</option>
+                            @if (productosApiLista != null)
+                            {
+                                @foreach (var prod in productosApiLista)
+                                {
+                                    <option value="@prod.Id">
+                                        @prod.nombre [@prod.presentacion] - (@prod.precio.ToString("C"))
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    @if (productoSeleccionado != null && productoSeleccionado.requierereceta)
+                    {
+                        <div class="alerta-receta" role="alert">
+                            <i class="bi bi-exclamation-diamond-fill"></i> <strong>Atención:</strong> Este medicamento requiere receta médica.
+                        </div>
+                    }
+
+                    <div class="campo-grupo">
+                        <label>3. Cantidad:</label>
+                        <input type="number" class="control-input" @bind-value="cantidadIngresada" min="1" />
+                    </div>
+
+                    <button class="btn-agregar-ticket" @onclick="AgregarAlCarrito" disabled="@(productoSeleccionado == null)">
+                        <i class="bi bi-plus-circle-fill"></i> Agregar al Ticket
+                    </button>
                 </div>
-            }
-            else if (!listaDeCommits.Any())
+            </div>
+
+            @* --- COLUMNA DERECHA: CARRITO --- *@
+            <div class="columna-carrito">
+                <div class="card-carrito">
+                    <h3>Artículos en el Ticket Actual</h3>
+
+                    <div class="tabla-responsiva">
+                        <table class="tabla-punto-venta">
+                            <thead>
+                                <tr>
+                                    <th>Medicamento</th>
+                                    <th>Laboratorio</th>
+                                    <th>Cant.</th>
+                                    <th>Precio U.</th>
+                                    <th>Subtotal</th>
+                                    <th>Quitar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!carritoAuxiliar.Any())
+                                {
+                                    <tr>
+                                        <td colspan="6" class="tabla-vacia">
+                                            <i class="bi bi-cart-x"></i> No hay productos agregados a la venta actual.
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var item in carritoAuxiliar)
+                                    {
+                                        <tr>
+                                            <td class="texto-destacado">
+                                                @item.NombreTemporal
+                                                @if (item.RequiereRecetaTemporal)
+                                                {
+                                                    <span class="badge-receta">Receta</span>
+                                                }
+                                            </td>
+                                            <td class="texto-secundario">@item.LaboratorioTemporal</td>
+                                            <td class="texto-centro">@item.Detalle.Cantidad</td>
+                                            <td class="texto-derecha">@item.Detalle.Precio.ToString("C")</td>
+                                            <td class="texto-derecha subtotal-monto">@((item.Detalle.Cantidad * item.Detalle.Precio).ToString("C"))</td>
+                                            <td class="texto-centro">
+                                                <button class="btn-quitar-item" @onclick="() => EliminarDelCarrito(item)">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="resumen-ticket-inferior">
+                        <div class="contenedor-total">
+                            <span class="etiqueta-total">Monto Total a Liquidar</span>
+                            <h3 class="monto-total-numero">@totalVenta.ToString("C")</h3>
+                        </div>
+                        <button class="btn-guardar-azure" @onclick="GuardarTicketEnAzure"
+                                disabled="@(clienteSeleccionadoId == 0 || !carritoAuxiliar.Any())">
+                            <i class="bi bi-printer-fill"></i> Cerrar y Guardar Ticket
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* --- SECCIÓN INFERIOR: HISTORIAL --- *@
+        <div class="card-historial">
+            <h3><i class="bi bi-receipt-cutoff"></i> Historial de Tickets Guardados (Azure SQL)</h3>
+            <hr />
+
+            @if (historialTickets == null)
             {
-                <div class="alert alert-warning">No se encontraron commits en este repositorio.</div>
+                <p class="texto-cargando">Cargando registros históricos...</p>
+            }
+            else if (!historialTickets.Any())
+            {
+                <div class="alerta-historial-vacio">
+                    No hay tickets registrados históricamente en la base de datos.
+                </div>
             }
             else
             {
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
+                <div class="tabla-responsiva">
+                    <table class="tabla-historial">
+                        <thead>
                             <tr>
-                                <th>Commit ID</th>
-                                <th>Mensaje / Descripción</th>
-                                <th>Autor</th>
-                                <th>Fecha y Hora</th>
+                                <th>Ticket</th>
+                                <th>Fecha / Hora</th>
+                                <th>Cliente / Paciente</th>
+                                <th>Detalle de Productos (Cruce en Memoria con API)</th>
+                                <th>Total</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var commit in listaDeCommits)
+                            @foreach (var t in historialTickets)
                             {
                                 <tr>
+                                    <td class="ticket-id">#@t.Id</td>
+                                    <td>@t.Fecha.ToString("dd/MM/yyyy hh:mm tt")</td>
+                                    <td class="texto-destacado">@(t.Cliente?.Nombre ?? "Cliente General")</td>
                                     <td>
-                                        <span class="badge bg-secondary font-monospace">@commit.IdCorto</span>
+                                        <ul class="lista-detalles-historial">
+                                            @foreach (var det in t.Detalles)
+                                            {
+                                                <li>
+                                                    <i class="bi bi-arrow-right-short"></i>
+                                                    <strong>@ObtenerNombreProducto(det.ProductoApiId)</strong>
+                                                    <span>(x@det.Cantidad)</span> -
+                                                    <span class="precio-item-historial">@det.Precio.ToString("C")</span>
+                                                </li>
+                                            }
+                                        </ul>
                                     </td>
-                                    <td class="fw-bold text-dark">@commit.Mensaje</td>
-                                    <td>👤 @commit.Autor</td>
-                                    <td class="text-muted">📅 @commit.Fecha.ToString("dd/MM/yyyy hh:mm tt")</td>
+                                    <td class="total-final-historial">@t.Total.ToString("C")</td>
                                 </tr>
                             }
                         </tbody>
@@ -68,16 +227,158 @@
             }
         </div>
     </div>
-</div>
+
     <footer>
         <p>&copy; 2026 Farmacias Similares. Todos los derechos reservados.</p>
     </footer>
 </body>
 @code {
-    private List<GitCommitModel>? listaDeCommits;
+    private List<Cliente>? clientesLista;
+    private List<ProductoTodos>? productosApiLista;
+    private List<Ticket>? historialTickets;
 
-    protected override void OnInitialized()
+    private int clienteSeleccionadoId = 0;
+    private ProductoTodos? productoSeleccionado;
+    private int cantidadIngresada = 1;
+
+    // Clase interna auxiliar para renderizar datos de la API en la vista temporalmente
+    private class ItemCarrito
     {
-        listaDeCommits = GitService.ObtenerHistorialCommits();
+        public string NombreTemporal { get; set; } = "";
+        public string LaboratorioTemporal { get; set; } = "";
+        public bool RequiereRecetaTemporal { get; set; }
+        public DetalleTicket Detalle { get; set; } = new();
+    }
+
+    private List<ItemCarrito> carritoAuxiliar = new List<ItemCarrito>();
+    private decimal totalVenta => carritoAuxiliar.Sum(x => x.Detalle.Cantidad * x.Detalle.Precio);
+    private bool mostrarAlertaExito = false;
+
+    // URL de la nueva API de Salud que me proporcionaste
+    private const string UrlProductosSalud = "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/productos";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarDatosIniciales();
+    }
+
+    private async Task CargarDatosIniciales()
+    {
+        try
+        {
+            // 1. Carga clientes locales
+            clientesLista = await DbContext.ClientesF.OrderBy(c => c.Nombre).ToListAsync();
+
+            // 2. Carga la API de Salud (Medicamentos)
+            productosApiLista = await Http.GetFromJsonAsync<List<ProductoTodos>>(UrlProductosSalud);
+
+            // 3. Carga el historial de Tickets guardados en Azure SQL
+            historialTickets = await DbContext.TicketsF
+                .Include(t => t.Cliente)
+                .Include(t => t.Detalles)
+                .OrderByDescending(t => t.Fecha)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error de inicialización: {ex.Message}");
+        }
+    }
+
+    // Cruce dinámico: busca el id en la respuesta de la API para pintar el nombre en el historial
+    private string ObtenerNombreProducto(int apiId)
+    {
+        var prod = productosApiLista?.FirstOrDefault(p => p.Id == apiId);
+        return prod != null ? $"{prod.nombre} ({prod.presentacion})" : $"Fármaco Ext. (ID: {apiId})";
+    }
+
+    private void OnProductoSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int id) && id > 0)
+        {
+            productoSeleccionado = productosApiLista?.FirstOrDefault(p => p.Id == id);
+        }
+        else
+        {
+            productoSeleccionado = null;
+        }
+    }
+
+    private void AgregarAlCarrito()
+    {
+        if (productoSeleccionado != null && cantidadIngresada > 0)
+        {
+            var itemExistente = carritoAuxiliar.FirstOrDefault(x => x.Detalle.ProductoApiId == productoSeleccionado.Id);
+
+            if (itemExistente != null)
+            {
+                itemExistente.Detalle.Cantidad += cantidadIngresada;
+            }
+            else
+            {
+                carritoAuxiliar.Add(new ItemCarrito
+                {
+                    NombreTemporal = productoSeleccionado.nombre,
+                    LaboratorioTemporal = productoSeleccionado.laboratorio,
+                    RequiereRecetaTemporal = productoSeleccionado.requierereceta,
+                    Detalle = new DetalleTicket
+                    {
+                        ProductoApiId = productoSeleccionado.Id,
+                        Cantidad = cantidadIngresada,
+                        Precio = productoSeleccionado.precio
+                    }
+                });
+            }
+
+            cantidadIngresada = 1;
+        }
+    }
+
+    private void EliminarDelCarrito(ItemCarrito item)
+    {
+        carritoAuxiliar.Remove(item);
+    }
+
+    private async Task GuardarTicketEnAzure()
+    {
+        if (clienteSeleccionadoId == 0 || !carritoAuxiliar.Any()) return;
+
+        try
+        {
+            // 1. Instanciamos la cabecera del Ticket operativo
+            var nuevoTicket = new Ticket
+            {
+                ClienteId = clienteSeleccionadoId,
+                Fecha = DateTime.Now,
+                Total = totalVenta,
+                Estado = "Pagado"
+            };
+
+            DbContext.TicketsF.Add(nuevoTicket);
+            await DbContext.SaveChangesAsync(); // SQL genera el Ticket.Id
+
+            // 2. Recorremos el carrito insertando los detalles con el ID de la cabecera
+            foreach (var item in carritoAuxiliar)
+            {
+                item.Detalle.TicketId = nuevoTicket.Id;
+
+                // OJO: Asegúrate de que este DbSet se llame así en tu AppDbContext (DetallesTickets)
+                DbContext.DetalleTicketsF.Add(item.Detalle);
+            }
+
+            await DbContext.SaveChangesAsync();
+
+            // Refrescamos todo el historial para que aparezca la nueva fila abajo de inmediato
+            await CargarDatosIniciales();
+
+            carritoAuxiliar.Clear();
+            clienteSeleccionadoId = 0;
+            productoSeleccionado = null;
+            mostrarAlertaExito = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al impactar Azure: {ex.Message}");
+        }
     }
 }
