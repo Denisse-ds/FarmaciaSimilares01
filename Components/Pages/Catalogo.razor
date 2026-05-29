@@ -102,7 +102,7 @@
                     else
                     {
                         <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                            <p>No se encontraron productos con los filtros seleccionados.</p>
+                            <p>No se encontraron productos</p>
                         </div>
                     }
                 </div>
@@ -116,53 +116,76 @@
 
 
 @code {
-    private List<ProductoTodos>? listaTodos;
-    private List<SinReceta>? listaSinReceta;
-    private List<Especialidad>? listaEspecialidades;
 
-    private IEnumerable<dynamic>? ListaActual;
+    // ===================================================================
+    //   VARIABLES Y PROPIEDADES
+    // ===================================================================
+
+
+
+    private List<ProductoTodos>? listaTodos; // Cache para "Todos los productos"
+    private List<SinReceta>? listaSinReceta; // Cache para "Sin receta"
+    private List<Especialidad>? listaEspecialidades; // Cache para especialidades
+
+    private IEnumerable<dynamic>? ListaActual; // Lista que se muestra actualmente (puede ser de cualquiera de los tipos)
 
  
-    private string modoVista = "Todos";
-    private bool cargando = true;
+    private string modoVista = "Todos"; // "Todos", "SinReceta" o "Especialidad", inicialmente en "Todos"
+    private bool cargando = true; // Indicador de carga para mostrar mensaje mientras se obtienen datos
 
 
-    private List<int> especialidadesSeleccionadas = new List<int>();
+    private List<int> especialidadesSeleccionadas = new List<int>(); // IDs de especialidades seleccionadas para filtrar
 
-
+    // API Endpoints
     private string urlTodos = "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/productos";
     private string urlSinReceta = "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/productos/sinreceta";
     private string urlEspecialidades = "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/especialidades";
     private string urlFiltroEspecialidadBase = "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/productos/especialidad/";
 
+
+
+    // ===================================================================
+    //  CARGA INICIAL Y FUNCIONES DE CARGA
+    // ===================================================================
+
+
+    // Carga inicial: obtenemos especialidades y todos los productos
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            // Cargamos especialidades para el filtro lateral
  
             listaEspecialidades = await Http.GetFromJsonAsync<List<Especialidad>>(urlEspecialidades);
         }
         catch (Exception ex)
         {
+            // Si falla la carga de especialidades, inicializamos la lista vacía para evitar errores en la UI
             Console.WriteLine($"Error al cargar especialidades: {ex.Message}");
-            listaEspecialidades = new List<Especialidad>(); 
+            listaEspecialidades = new List<Especialidad>(); // Evita que la UI se rompa si no se pueden cargar las especialidades
         }
 
-        await CargarTodos();
+        await CargarTodos(); // Carga inicial de todos los productos
     }
+
+
+    // ===================================================================
+    // FUNCIONES DE CARGA Y FILTRADO
+    // ===================================================================
 
     private async Task CargarTodos()
     {
-        cargando = true;
-        modoVista = "Todos";
-        especialidadesSeleccionadas.Clear(); // Limpiamos selección
+        cargando = true; // Activamos indicador de carga
+        modoVista = "Todos"; // Cambiamos modo de vista para mostrar que estamos en "Todos los productos"
+        especialidadesSeleccionadas.Clear(); // Limpiamos selección, PORQUE SI ESTAMOS EN "TODOS", NO DEBERÍA HABER NINGUNA ESPECIALIDAD SELECCIONADA
 
         try
         {
+            // Si ya tenemos los productos en cache, no hacemos la llamada a la API de nuevo
             if (listaTodos == null)
-                listaTodos = await Http.GetFromJsonAsync<List<ProductoTodos>>(urlTodos);
+                listaTodos = await Http.GetFromJsonAsync<List<ProductoTodos>>(urlTodos); // Carga desde API solo la primera vez
 
-            ListaActual = listaTodos;
+            ListaActual = listaTodos; // Asignamos la lista de productos a la variable que se muestra en la UI
         }
         catch (Exception ex)
         {
@@ -170,12 +193,17 @@
         }
         finally
         {
-            cargando = false;
+            cargando = false; // Desactivamos indicador de carga, ya sea que la carga haya sido exitosa o haya fallado
         }
     }
 
+    // ==================================================================
+    // FUNCIONES DE FILTRADO POR ESPECIALIDAD Y SIN RECETA
+    // ==================================================================
+
     private async Task CargarSinReceta()
     {
+        // Lo miismo que en CargarTodos pero para la vista de "Sin receta"
         cargando = true;
         modoVista = "SinReceta";
         especialidadesSeleccionadas.Clear();
@@ -197,48 +225,52 @@
         }
     }
 
+    // Esta función se llama cada vez que el usuario marca o desmarca una especialidad en el filtro lateral
     private async Task AlCambiarEspecialidad(int especialidadId, object? isChecked)
     {
-        bool marcado = (bool)(isChecked ?? false);
+        bool marcado = (bool)(isChecked ?? false); // Convertimos el valor del checkbox a booleano, por si acaso viene nulo
 
-        if (marcado)
+        if (marcado) //si marcado = true, es decir, si el usuario acaba de marcar esta especialidad, la agregamos a la lista de seleccionadas
         {
             especialidadesSeleccionadas.Add(especialidadId);
         }
-        else
+        else // si marcado = false, es decir, si el usuario acaba de desmarcar esta especialidad, la quitamos de la lista de seleccionadas
         {
             especialidadesSeleccionadas.Remove(especialidadId);
         }
 
-        await BuscarPorEspecialidades();
+        await BuscarPorEspecialidades(); // Después de actualizar la lista de especialidades seleccionadas, llamamos a la función que hace la consulta a la API para obtener los productos que coinciden con las especialidades seleccionadas
     }
 
+
+    // Esta función hace la consulta a la API para obtener los productos que coinciden con las especialidades seleccionadas. Si no hay ninguna especialidad seleccionada, carga todos los productos.
     private async Task BuscarPorEspecialidades()
     {
-        if (!especialidadesSeleccionadas.Any())
+        if (!especialidadesSeleccionadas.Any()) //  Si no hay ninguna especialidad seleccionada, volvemos a cargar todos los productos (podríamos optimizar esto para no hacer la consulta de nuevo si ya tenemos los productos en cache, pero por simplicidad vamos a llamar a CargarTodos que ya maneja eso)
         {
             await CargarTodos();
             return;
         }
 
-        cargando = true;
+
+        cargando = true; 
         modoVista = "Especialidad";
-        var resultadosCombinados = new List<ProductoTodos>();
+        var resultadosCombinados = new List<ProductoTodos>(); // Lista temporal para almacenar los resultados combinados de todas las especialidades seleccionadas
 
         try
         {
-            foreach (var id in especialidadesSeleccionadas)
+            foreach (var id in especialidadesSeleccionadas) // Para cada especialidad seleccionada, hacemos una consulta a la API para obtener los productos que pertenecen a esa especialidad
             {
-                var urlConsulta = $"{urlFiltroEspecialidadBase}{id}";
+                var urlConsulta = $"{urlFiltroEspecialidadBase}{id}"; // Construimos la URL de consulta para esta especialidad
                 var productosEspecialidad = await Http.GetFromJsonAsync<List<ProductoTodos>>(urlConsulta);
 
-                if (productosEspecialidad != null)
+                if (productosEspecialidad != null) // Si la consulta fue exitosa y obtuvimos productos para esta especialidad, los agregamos a la lista de resultados combinados
                 {
                     resultadosCombinados.AddRange(productosEspecialidad);
                 }
             }
 
-            ListaActual = resultadosCombinados;
+            ListaActual = resultadosCombinados; // Asignamos la lista de resultados combinados a la variable que se muestra en la UI. Esta lista contiene todos los productos que pertenecen a cualquiera de las especialidades seleccionadas
         }
         catch (Exception ex)
         {

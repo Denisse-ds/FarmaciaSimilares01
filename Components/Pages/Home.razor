@@ -1,65 +1,121 @@
 ﻿@page "/"
-
+@inject HttpClient Http
+@using FarmaciaSimilares01.Data
+@inject MedicamentosDbContext DbContext // Inyectamos tu BD para contar los clientes reales
 @rendermode InteractiveServer
+@using FarmaciaSimilares01.Models
+@using Microsoft.EntityFrameworkCore
 
 <PageTitle>Farmacia Similares</PageTitle>
 
+<header>
+    <nav class="nav-page">
+        <ul>
+            <div class="logo-img">
+                <img src="/img/logo-similares.png" alt="Logo">
+            </div>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/catalogo">Catálogo</a></li>
+            <li><a href="/sistemaCRUD">Registrarte</a></li>
+            <li><a href="/venta">Historial</a></li>
+        </ul>
+    </nav>
+</header>
 
+<div class="banner-container">
+    <img src="img/anuncion.jpg" alt="Súper Descuentos" class="banner-img">
+</div>
 
-    <header>
-
-        <nav class="nav-page">
-            <ul>
-                <div class="logo-img">
-                    <img src="/img/logo-similares.png" alt="">
-                </div>
-                <li><a href="/">Inicio</a></li>
-                <li><a href="/catalogo">Catálogo</a></li>
-                <li><a href="/sistemaCRUD">Registrarte</a></li>
-                <li><a href="/venta">Historial</a></li>
-            </ul>
-
-        </nav>
-
-    </header>
-
-    <div class="banner-container">
-        <img src="img/anuncion.jpg" alt="Súper Descuentos" class="banner-img">
+@* --- SECCIÓN DE LOS INDICADORES (3 COLUMNAS) --- *@
+<div class="contenedor-metricas-home">
+    @* Izquierda: Imagen *@
+    <div class="bloque-metrica-imagen">
+        <img src="/img/simi_home.jpg" alt="Dr Simi Informativo" class="img-simi-indicador">
     </div>
 
-    <h2 class="titulo-seccion">Recomendaciones de la semana</h2>
+    @* Centro: Base de Datos Local *@
+    <div class="tarjeta-indicador-local">
+        <span class="subtitulo-metrica">Base de Datos: Clientes</span>
+        <h3 class="numero-metrica-real">@totalClientesRegistrados</h3>
+    </div>
 
-    <section class="recomendaciones-semana">
-        <div class="card">
-            <img src="/img/paras.webp" alt="Producto 1">
-            <p>Vitasimi Senior</p>
-            <span>$350.00</span>
-            <button>Saber más</button>
-        </div>
+    @* Derecha: API Externa *@
+    <div class="tarjeta-indicador-api">
+        <span class="subtitulo-metrica">Servidor Externo API</span>
+        <h3 class="numero-metrica-real">@totalInsumosApi</h3>
+    </div>
+</div>
 
-        <div class="card">
-            <img src="/img/paras.webp" alt="Producto 2">
-            <p>Vitasimi Dectrone</p>
-            <span>$350.00</span>
-            <button>Saber más</button>
-        </div>
+<h2 class="titulo-seccion">Recomendaciones de la semana</h2>
+<section class="recomendaciones-semana">
+    @if (serviciosLista != null && serviciosLista.Any())
+    {
+        @foreach (var serv in serviciosLista.Take(3))
+        {
+            <div class="card">
+                <img src="/img/paras.webp" alt="@serv.Nombre">
+                <p>@serv.Nombre</p>
+                <small class="text-muted d-block" style="font-size: 13px; margin-bottom: 5px;">
+                    @serv.Descripcion (@serv.Duracion min)
+                </small>
+                <span>@serv.Precio.ToString("0.00 MXN")</span>
+                <button onclick="window.location.href='/punto-venta'">Saber más</button>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-muted">Cargando la API...</p>
+    }
+</section>
 
-        <div class="card">
-            <img src="/img/paras.webp" alt="Producto 3">
-            <p>Simisun FPS 50+</p>
-            <span>$420.00</span>
-            <button>Saber más</button>
-        </div>
+<footer>
+    <p>&copy; 2026 Farmacias Similares. Todos los derechos reservados.</p>
+</footer>
 
-        <div class="card">
-            <img src="/img/paras.webp" alt="Producto 4">
-            <p>Simisun FPS 50+</p>
-            <span>$420.00</span>
-            <button>Saber más</button>
-        </div>
-    </section>
+@code {
+    private List<ServicioMedica>? serviciosLista;
 
-    <footer>
-        <p>&copy; 2026 Farmacias Similares. Todos los derechos reservados.</p>
-    </footer>
+    // Variables dinámicas para los indicadores reales que pide el maestro
+    private int totalClientesRegistrados = 0;
+    private int totalInsumosApi = 0;
 
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. OBTENER DATO REAL DE TU AZURE SQL (Métrica local)
+        try
+        {
+            // Hace un conteo rápido directo de la tabla ClientesF de tu base de datos
+            totalClientesRegistrados = await DbContext.ClientesF.CountAsync();
+        }
+        catch (Exception ex)
+        {
+            totalClientesRegistrados = 0; // Si falla la BD, se queda en 0 por seguridad
+            Console.WriteLine($"Error al contar clientes en SQL: {ex.Message}");
+        }
+
+        // 2. OBTENER DATO REAL DE LA API EXTERNA (Métrica remota)
+        try
+        {
+            using var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(4));
+
+            var respuesta = await Http.GetFromJsonAsync<List<ServicioMedica>>(
+                "https://api-udec-pweb-aedec9hxbugye0am.westus3-01.azurewebsites.net/api/salud/servicios",
+                cts.Token
+            );
+
+            if (respuesta != null)
+            {
+                serviciosLista = respuesta;
+                // Asignamos el conteo real de elementos que regresó la API de internet
+                totalInsumosApi = serviciosLista.Count;
+            }
+        }
+        catch (Exception ex)
+        {
+            serviciosLista = new List<ServicioMedica>();
+            totalInsumosApi = 0; // Si la API está caída, marca cero y no rompe la app
+            Console.WriteLine($"API fuera de servicio. No se pudo cargar: {ex.Message}");
+        }
+    }
+}
