@@ -40,11 +40,11 @@
 
 
 
-<div class="punto-venta-container">
+<div class="caja-registradora-gigante">
 
 
 
-    <div class="encabezado-pagina">
+    <div class="titulo-de-arriba">
         <h2><i class="bi bi-capsule"></i> Comprar</h2> 
     </div>
 
@@ -57,30 +57,30 @@
 
     @if (mostrarAlertaExito)
     {
-        <div class="alerta-exito" role="alert">
+        <div class="aviso-todo-salio-bien" role="alert">
             <strong>Ticket ya esta lito :D</strong> 
-            <button type="button" class="btn-cerrar-alerta" @onclick="() => mostrarAlertaExito = false">×</button>
+            <button type="button" class="boton-alerta-adios" @onclick="() => mostrarAlertaExito = false">×</button>
         </div>
     }
 
 
 
+    
+    
 
 
-
-
-
+    
   
 
 
-    <div class="bloque-operativo">
+    <div class="zona-de-trabajo-pesada">
 
 
        
-
+       
        
         <div class="columna-formulario">
-            <div class="card-formulario">
+            <div class="tarjeta-de-pedidos">
                 <h3>Compra ahora</h3>
 
 
@@ -89,9 +89,9 @@
                 @* =========================================== *@
 
 
-                <div class="campo-grupo">
+                <div class="campo-inputs">
                     <label>1. Paciente:</label>
-                    <select class="control-input" @bind="clienteSeleccionadoId">
+                    <select class="cajita-pa-seleccionar" @bind="clienteSeleccionadoId">
                         <option value="0">Cliente</option>
                         @if (clientesLista != null)
                         {
@@ -106,8 +106,8 @@
                         }
                     </select>
                 </div>
-
-                <div class="campo-grupo">
+                
+                <div class="campo-inputs">
                     <label>2. Medicamento:</label>
 
                     @* ============================================= *@
@@ -139,7 +139,7 @@
                 @if (productoSeleccionado != null && productoSeleccionado.requierereceta)
                 {
 
-                    <div class="alerta-receta" role="alert">
+                    <div class=" peligro-de-receta" role="alert">
                         <i class="bi bi-exclamation-diamond-fill"></i> <strong>Atención:</strong> Necesitas receta médica, lo siento
                     </div>
                 }
@@ -148,9 +148,9 @@
                 @*   --- GUARDAR LA CANTIDAD SELECCIONADA   --- *@
                 @* ============================================ *@
 
-                <div class="campo-grupo">
+                <div class="campo-inputs">
                     <label>3. Cantidad:</label>
-                    <input type="number" class="control-input" @bind-value="cantidadIngresada" min="1" />
+                    <input type="number" class="cajita-pa-seleccionar" @bind-value="cantidadIngresada" min="1" />
                 </div>
 
                 @* ============================================ *@
@@ -158,29 +158,32 @@
                 @* ============================================ *@
 
                 @* Disabled: permite desactivar el botón si no hay producto seleccionado *@
-                <button class="btn-agregar-ticket" @onclick="AgregarAlCarrito" disabled="@(productoSeleccionado == null)">
+                <button class="boton-ticket-pagar" @onclick="AgregarAlCarrito" disabled="@(productoSeleccionado == null)">
                     <i class="bi bi-plus-circle-fill"></i> Realizar compra
                 </button>
             </div>
         </div>
 
+       
+        
 
         @* ============================================ *@
         @*  ---    PRODUCTOS AGREGADOS EN TU COMRA  --- *@
         @* ============================================ *@
 
+        
        
         <div class="columna-carrito">
 
-            <div class="card-carrito">
+            <div class="tarjeta-del-super">
                 <h3>Artículos en el Ticket Actual</h3>
 
-
+                
 
                 <div class="tabla-responsiva">
 
 
-                    <table class="tabla-punto-venta">
+                    <table class="tabla-tickets-compras">
 
                         @* ============================================ *@
                         @*   ---        NOMBRE DE LOS CAMPOS        --- *@
@@ -202,7 +205,7 @@
                             @if (!carritoAuxiliar.Any())
                             {
                                 <tr>
-                                    <td colspan="6" class="tabla-vacia">
+                                    <td colspan="6" class="tabla-sin-nada">
                                         <i class="bi bi-cart-x"></i> Agrega productos para empezar :D
                                     </td>
                                 </tr>
@@ -216,7 +219,7 @@
                                             @item.NombreTemporal
                                             @if (item.RequiereRecetaTemporal)
                                             {
-                                                <span class="badge-receta">Receta</span>
+                                                <span class="etiqueta-del-doctor ">Receta</span>
                                             }
                                         </td>
                                         <td>@item.LaboratorioTemporal</td>
@@ -225,7 +228,7 @@
                                         <td>@((item.Detalle.Cantidad * item.Detalle.Precio).ToString("$#,##0.00 MXN"))</td>
                                         <td>
                                             @*Boton para quitar item (producto)*@
-                                            <button class="btn-quitar-item" @onclick="() => EliminarDelCarrito(item)">
+                                            <button class="boton-quitar-producto " @onclick="() => EliminarDelCarrito(item)">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </td>
@@ -235,18 +238,18 @@
                         </tbody>
                     </table>
                 </div>
-
+                
                 @* ============================================ *@
                 @* --- TOTAL A PAGAR  (TODO LOS PRODUCTOS) ---  *@
                 @* ============================================ *@
-
-                <div class="resumen-ticket-inferior">
-                    <div class="contenedor-total">                     
-                        <h3 class="monto-total-numero">@totalVenta.ToString("$#,##0.00 MXN")</h3>
+                
+                <div class="zona-de-pagar-abajo">
+                    <div class="caja-dinero">
+                        <h3 class="numerote-del-dinero">@totalVenta.ToString("$#,##0.00 MXN")</h3>
                     </div>
 
 
-                    <button class="btn-guardar-azure" @onclick="GuardarTicketEnAzure" disabled="@(clienteSeleccionadoId == 0 || !carritoAuxiliar.Any())"> 
+                    <button class="boton-guardado" @onclick="GuardarTicketEnAzure" disabled="@(clienteSeleccionadoId == 0 || !carritoAuxiliar.Any())">
                         <i class="bi bi-printer-fill"></i> Guardar 
                     </button>
 
@@ -255,14 +258,14 @@
             </div>
         </div>
     </div>
-
+    
     
     @* ============================================ *@
     @* ---    TABLA DE HISTORIAL DE TICKETS   ---   *@
     @* ============================================ *@
 
   
-    <div class="card-historial">
+    <div class="tarjeta-de-tickets">
 
         <h3><i class="bi bi-receipt-cutoff"></i> Historial de Tickets</h3>
         <hr />
@@ -276,7 +279,7 @@
         @*Una vez que se han cargado los tickets y no hay ninguno...*@
         else if (!historialTickets.Any())
         {
-            <div class="alerta-historial-vacio">
+            <div class="nada-historial">
                 No hay tickets registrados
             </div>
         }
@@ -288,7 +291,7 @@
             @* ============================================ *@
 
             <div class="tabla-responsiva">
-                <table class="tabla-historial">
+                <table class="tabla-tickets-historial">
                     <thead>
                         <tr>
                             <th>Ticket</th>
@@ -299,7 +302,7 @@
                         </tr>
                     </thead>
                     <tbody>
-
+                        
                         @*Recorrido por cada ticket en el historial*@
                         @foreach (var t in historialTickets)
                         {
@@ -309,19 +312,19 @@
                                 @*Busca el cliente asociado al detalle en la BD(izquierda). si no lo tiene le pone "Cliente General"(derecha)*@
                                 <td class="texto-destacado">@(t.Cliente?.Nombre ?? "Cliente General")</td>
                                 <td>
-                                    <ul class="lista-detalles-historial">
+                                    <ul class="detalles-historial">
                                         @*Recorrido por cada detalle en el ticket*@
                                         @foreach (var det in t.Detalles)
                                         {
                                             <li>
                                                 <i class="bi bi-arrow-right-short"></i>
                                            
-                                                <span class="precio-item-historial">@det.Precio.ToString("0.00 MXN")</span>
+                                                <span class="precio-historial">@det.Precio.ToString("0.00 MXN")</span>
                                             </li>
                                         }
                                     </ul>
                                 </td>
-                                <td class="total-final-historial">@t.Total.ToString("0.00 MXN")</td>
+                                <td class="total-historial">@t.Total.ToString("0.00 MXN")</td>
                             </tr>
                         }
                     </tbody>
@@ -331,13 +334,14 @@
     </div>
 </div>
 
+
     <footer>
         <p>&copy; 2026 Farmacias Similares. Todos los derechos reservados.</p>
     </footer>
 
 @code {
 
-
+    
 
 
 
@@ -508,7 +512,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al impactar Azure: {ex.Message}");
+            Console.WriteLine($"Error con Azure: {ex.Message}");
         }
     }
 }

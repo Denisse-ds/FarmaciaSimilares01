@@ -456,23 +456,22 @@ main {
    7. VISTA: PUNTO DE VENTA E HISTORIAL
    ========================================================================== */
 
-.punto-venta-container {
+.punto-venta-container /* caja-registradora-gigante */ {
     max-width: 1100px;
     margin: 0 auto;
     padding: 20px;
 }
 
-.encabezado-pagina {
+.encabezado-pagina /* titulo-de-arriba */ {
     padding-bottom: 15px;
-
 }
 
-    .encabezado-pagina h2 {
+    .encabezado-pagina /* titulo-de-arriba */ h2 {
         font-size: 24px;
         color: var(--color-azul);
     }
 
-.alerta-exito, .alerta-receta {
+.alerta-exito /* aviso-todo-salio-bien */, .alerta-receta /* peligro-de-receta */ {
     padding: 12px 15px;
     font-size: 14px;
     margin-bottom: 20px;
@@ -481,54 +480,110 @@ main {
     align-items: center;
 }
 
-.alerta-exito {
+.alerta-exito /* aviso-todo-salio-bien */ {
     background-color: #e6f4ea;
     border: 1px solid #34a853;
     color: #137333;
 }
 
-.alerta-receta {
+.alerta-receta /* peligro-de-receta */ {
     background-color: #fce8e6;
     border: 1px solid #ea4335;
     color: #c5221f;
     margin-top: 10px;
 }
 
-.btn-cerrar-alerta {
+.btn-cerrar-alerta /* boton-alerta-adios */ {
     background: none;
     border: none;
     font-size: 20px;
     cursor: pointer;
 }
 
-.bloque-operativo {
+.bloque-operativo /* zona-de-trabajo-pesada */ {
     display: flex;
     flex-direction: column;
     gap: 30px;
 }
+
 /*
-.card-formulario, .card-carrito, .card-historial {
+.card-formulario /* tarjeta-de-pedidos */, .card-carrito /* tarjeta-del-super */, .card-historial /* /* ==========================================================================
+   7. VISTA: PUNTO DE VENTA E HISTORIAL
+   ========================================================================== */
+
+.punto-venta-container /* caja-registradora-gigante */ {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.encabezado-pagina /* titulo-de-arriba */ {
+    padding-bottom: 15px;
+}
+
+    .encabezado-pagina /* titulo-de-arriba */ h2 {
+        font-size: 24px;
+        color: var(--color-azul);
+    }
+
+.alerta-exito /* aviso-todo-salio-bien */, .alerta-receta /* peligro-de-receta */ {
+    padding: 12px 15px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.alerta-exito /* aviso-todo-salio-bien */ {
+    background-color: #e6f4ea;
+    border: 1px solid #34a853;
+    color: #137333;
+}
+
+.alerta-receta /* peligro-de-receta */ {
+    background-color: #fce8e6;
+    border: 1px solid #ea4335;
+    color: #c5221f;
+    margin-top: 10px;
+}
+
+.btn-cerrar-alerta /* boton-alerta-adios */ {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.bloque-operativo /* zona-de-trabajo-pesada */ {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/*
+.card-formulario /* tarjeta-de-pedidos */, .card-carrito /* tarjeta-del-super */, .card-historial /* tarjeta-de-tickets */ {
     background: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     padding: 20px;
 }
-*/
 
-    .card-formulario h3, .card-carrito h3, .card-historial h3 {
+ */
+
+    .card-formulario /* tarjeta-de-pedidos */ h3, .card-carrito /* tarjeta-del-super */ h3, .card-historial /* tarjeta-de-tickets */ h3 {
         font-size: 18px;
         color: #333;
         margin-top: 0;
-        margin-bottom: 20px;   
+        margin-bottom: 20px;
         padding-left: 10px;
     }
 
-.campo-grupo {
+.campo-grupo /* campo-inputs */ {
     margin-bottom: 15px;
 }
 
-
-.control-input {
+.control-input /* cajita-pa-seleccionar */ {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
@@ -538,7 +593,7 @@ main {
     box-sizing: border-box;
 }
 
-.btn-agregar-ticket {
+.btn-agregar-ticket /* boton-ticket-pagar */ {
     background-color: var(--color-azul);
     border: none;
     padding: 12px 20px;
@@ -549,64 +604,65 @@ main {
     border: 1px solid #ccc;
 }
 
-    .btn-agregar-ticket:disabled {
-        background-color: var(--color-fondo);  
+    .btn-agregar-ticket /* boton-ticket-pagar */ :disabled {
+        background-color: var(--color-fondo);
     }
 
-.tabla-responsiva {
+.tabla-responsiva /* tabla-responsiva */ {
     margin-bottom: 20px;
 }
 
-.tabla-punto-venta, .tabla-historial {
+.tabla-punto-venta /* tabla-tickets-compras */, .tabla-historial /* tabla-tickets-historial */ {
     width: 100%;
     font-size: 14px;
     text-align: left;
 }
 
-    .tabla-punto-venta th, .tabla-historial th {
+    .tabla-punto-venta /* tabla-tickets-compras */ th, .tabla-historial /* tabla-tickets-historial */ th {
         background-color: #f1f3f4;
         color: #555;
         padding: 12px;
-        
     }
 
-    .tabla-punto-venta td, .tabla-historial td {
+    .tabla-punto-venta /* tabla-tickets-compras */ td, .tabla-historial /* tabla-tickets-historial */ td {
         padding: 12px;
         border-bottom: 1px solid #eeeeee;
     }
+
 /*
-.texto-destacado {
+.texto-destacado  letras-mamalonas  {
     font-weight: bold;
     color: #111;
 }
 
-.texto-secundario {
+.texto-secundario  letras-x  {
     color: #666;
     font-size: 13px;
 }
 
-.texto-centro {
+.texto-centro letras-en-medio  {
     text-align: center;
 }
 
-.texto-derecha {
+.texto-derecha letras-pa-alla  {
     text-align: right;
 }
 
-.subtotal-monto {
+.subtotal-monto  varo-a-medias  {
     font-weight: bold;
     color: var(--color-azul);
 }
+
 */
 
-.tabla-vacia {
+.tabla-vacia /* tabla-sin-nada */ {
     text-align: center;
     padding: 30px !important;
     color: #999;
     font-style: italic;
 }
 
-.badge-receta {
+.badge-receta /* etiqueta-del-doctor */ {
     background-color: #fce8e6;
     color: #c5221f;
     font-size: 11px;
@@ -615,15 +671,16 @@ main {
     margin-left: 5px;
 }
 
-.btn-quitar-item {
+.btn-quitar-item /* boton-quitar-producto */ {
     background: none;
     border: none;
     color: #ea4335;
     cursor: pointer;
     font-size: 16px;
 }
+
 /*
-.resumen-ticket-inferior {
+.resumen-ticket-inferior /* zona-de-pagar-hasta-abajo {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -632,7 +689,7 @@ main {
 }
 
 
-.contenedor-total {
+.contenedor-total /* caja-del-dinero  {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -640,19 +697,19 @@ main {
 
 */
 
-.etiqueta-total {
+.etiqueta-total /* pagar-total-dinero */ {
     font-size: 14px;
     color: #666;
 }
 
-.monto-total-numero {
+.monto-total-numero /* numerote-del-dinero */ {
     font-size: 22px;
     color: var(--color-azul);
     margin: 0;
     font-weight: bold;
 }
 
-.btn-guardar-azure {
+.btn-guardar-azure /* boton-guardado */ {
     background-color: var(--color-amarillo);
     color: var(--color-fondo);
     border: 1px solid #ccc;
@@ -663,19 +720,239 @@ main {
     cursor: pointer;
 }
 
-    .btn-guardar-azure:disabled {
+    .btn-guardar-azure /* boton-guardado */ :disabled {
         background-color: #e0e0e0;
         color: #999;
-        
     }
 
-.card-historial {
+.card-historial /* card-historial */ {
     margin-top: 30px;
 }
 
-    .card-historial hr {
+    .card-historial /* card-historial */ hr {
         display: none;
     }
+
+.ticket-id /* ticket-id */ {
+    font-family: monospace;
+    font-weight: bold;
+    color: var(--color-texto);
+}
+
+.lista-detalles-historial /* detalles-historial */ {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .lista-detalles-historial /* detalles-historial */ li {
+        font-size: 13px;
+        color: #444;
+        margin-bottom: 4px;
+    }
+
+.precio-item-historial /* precio-historial */ {
+    color: #666;
+}
+
+.total-final-historial /* total-historial */ {
+    font-weight: bold;
+    color: #333;
+    text-align: right;
+}
+
+/* ==========================================================================
+   7. VISTA: PUNTO DE VENTA E HISTORIAL (VERSIÓN PERSONALIZADA)
+   ========================================================================== */
+
+.caja-registradora-gigante {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.titulo-de-arriba {
+    padding-bottom: 15px;
+}
+
+    .titulo-de-arriba h2 {
+        font-size: 24px;
+        color: var(--color-azul);
+    }
+
+.aviso-todo-salio-bien, .peligro-de-receta {
+    padding: 12px 15px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.aviso-todo-salio-bien {
+    background-color: #e6f4ea;
+    border: 1px solid #34a853;
+    color: #137333;
+}
+
+.peligro-de-receta {
+    background-color: #fce8e6;
+    border: 1px solid #ea4335;
+    color: #c5221f;
+    margin-top: 10px;
+}
+
+.boton-alerta-adios {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.zona-de-trabajo-pesada {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+
+.tarjeta-de-pedidos, .tarjeta-del-super, .tarjeta-de-tickets {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 20px;
+}
+
+    .tarjeta-de-pedidos h3, .tarjeta-del-super h3, .tarjeta-de-tickets h3 {
+        font-size: 18px;
+        color: #333;
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding-left: 10px;
+    }
+
+.campo-inputs {
+    margin-bottom: 15px;
+}
+
+
+.cajita-pa-seleccionar, .control-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: var(--color-fondo);
+    box-sizing: border-box;
+}
+
+.boton-ticket-pagar {
+    background-color: var(--color-azul);
+    border: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+}
+
+    .boton-ticket-pagar:disabled {
+        background-color: var(--color-fondo);
+    }
+
+.tabla-responsiva {
+    margin-bottom: 20px;
+}
+
+.tabla-tickets-compras, .tabla-tickets-historial {
+    width: 100%;
+    font-size: 14px;
+    text-align: left;
+}
+
+    .tabla-tickets-compras th, .tabla-tickets-historial th {
+        background-color: #f1f3f4;
+        color: #555;
+        padding: 12px;
+    }
+
+    .tabla-tickets-compras td, .tabla-tickets-historial td {
+        padding: 12px;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+
+.texto-destacado {
+    font-weight: bold;
+    color: #111;
+}
+
+.tabla-sin-nada {
+    text-align: center;
+    padding: 30px !important;
+    color: #999;
+    font-style: italic;
+}
+
+.etiqueta-del-doctor {
+    background-color: #fce8e6;
+    color: #c5221f;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+
+.boton-quitar-producto {
+    background: none;
+    border: none;
+    color: #ea4335;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+
+.zona-de-pagar-abajo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.caja-dinero {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.numerote-del-dinero {
+    font-size: 22px;
+    color: var(--color-azul);
+    margin: 0;
+    font-weight: bold;
+}
+
+.boton-guardado {
+    background-color: var(--color-amarillo);
+    color: var(--color-fondo);
+    border: 1px solid #ccc;
+    border: none;
+    padding: 12px 25px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .boton-guardado:disabled {
+        background-color: #e0e0e0;
+        color: #999;
+    }
+
+.tarjeta-de-tickets hr {
+    display: none;
+}
 
 .ticket-id {
     font-family: monospace;
@@ -683,31 +960,30 @@ main {
     color: var(--color-texto);
 }
 
-.lista-detalles-historial {
+.detalles-historial {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-    .lista-detalles-historial li {
+    .detalles-historial li {
         font-size: 13px;
         color: #444;
         margin-bottom: 4px;
     }
 
-.precio-item-historial {
+.precio-historial {
     color: #666;
 }
 
-.total-final-historial {
+.total-historial {
     font-weight: bold;
     color: #333;
     text-align: right;
 }
 
-.texto-cargando, .alerta-historial-vacio {
+.texto-cargando, .nada-historial {
     text-align: center;
     color: var(--color-texto);
     padding: 20px;
 }
-
